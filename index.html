@@ -31,6 +31,8 @@ button{font:inherit;cursor:pointer;border:1px solid #e5d2e9;background:white;col
 .dot{width:5px;height:5px;border-radius:50%}
 .gold{background:#e5ba68}
 .silver{background:#9baad2}
+ .benefitMark.goldMark{color:#d4a843}
+.benefitMark.silverMark{color:#9baad2}
 .benefitMark{color:#b09abd;font-size:11px;display:block}
 h2{color:#a17bb2;font-family:Georgia,serif;font-size:18px;font-weight:normal;margin:0 0 15px}
 .entry{padding:12px 4px;border-bottom:1px dashed #e8d7eb;line-height:1.7}
@@ -282,13 +284,13 @@ function render(){
    specialData[date]||
    closedDates.includes(date)||
    officialSchedule[date];
-
+const showTeam = officialSchedule[date]?.team;
   out+='<div class="day '+
    (entries.length?"has ":"")+
    (selected===d?"selected":"")+
    '" onclick="choose('+d+')">'+d+
    (entries.length?'<span class="mark">♡</span>':'')+
-   (hasInfo?'<span class="benefitMark">✧</span>':'')+
+   (hasInfo?'<span class="benefitMark '+(showTeam==="Gold Moon"?"goldMark":showTeam==="Silver Moon"?"silverMark":"")+'">✧</span>':'')+
    '<div class="dots">'+dots+'</div></div>';
  }
 
