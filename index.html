@@ -1,12 +1,488 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>STST3 🌙</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shining Theater ♡</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(#fffafc,#f9f2fb);color:#776782;font-family:-apple-system,sans-serif}
+main{padding:25px 15px 55px;max-width:500px;margin:auto}
+header{text-align:center;padding:25px 0 30px}
+.symbol{color:#c49aca;letter-spacing:12px}
+h1{font-family:Georgia,serif;font-style:italic;font-weight:normal;font-size:34px;color:#9675ac;margin:12px 0 5px}
+.subtitle{font-size:10px;letter-spacing:4px;color:#b59abd}
+.card{background:white;border:1px solid #ead9ed;border-radius:23px;padding:18px 13px;margin-bottom:16px;box-shadow:0 5px 20px #d8bfd51c}
+.nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.nav strong{color:#9978ad;font-size:18px}
+button{font:inherit;cursor:pointer;border:1px solid #e5d2e9;background:white;color:#9875ac;border-radius:14px;padding:10px 13px}
+.pills{display:flex;gap:6px;margin-bottom:15px}
+.pills button{flex:1;padding:10px 3px;font-size:12px}
+.active{background:#f1e3f2;border-color:#cda9d5}
+.week,.calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));text-align:center}
+.week{color:#aa8eb7;font-size:12px;margin-bottom:8px}
+.day{min-height:57px;padding:7px 0 3px;border:1px solid transparent;border-radius:12px;font-size:14px;color:#786985;cursor:pointer}
+.day.has{background:#fce9f3}
+.day.selected{border-color:#c795bd}
+.mark{display:block;color:#d28bb3;font-size:13px}
+.dots{display:flex;justify-content:center;gap:3px;margin-top:4px}
+.dot{width:5px;height:5px;border-radius:50%}
+.gold{background:#e5ba68}
+.silver{background:#9baad2}
+.benefitMark{color:#b09abd;font-size:11px;display:block}
+h2{color:#a17bb2;font-family:Georgia,serif;font-size:18px;font-weight:normal;margin:0 0 15px}
+.entry{padding:12px 4px;border-bottom:1px dashed #e8d7eb;line-height:1.7}
+.small{font-size:12px;color:#aa98b0;line-height:1.7}
+.primary{background:#b28cc3;color:white;border:0;padding:12px 18px}
+.danger{color:#c46b8d}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+input,textarea,select{display:block;width:100%;margin:6px 0 14px;border:1px solid #e5d5e8;border-radius:11px;padding:12px;background:white;color:#67596e;font:inherit}
+label{display:block;font-size:13px;color:#947da0}
+.gift{display:flex;align-items:center;gap:12px;padding:11px 2px;border-bottom:1px dashed #eadcec}
+.heart{border:0;padding:0;font-size:25px;color:#cf8cb3}
+.benefitBox{background:#fffafd;border:1px solid #efdfed;border-radius:15px;padding:13px;margin:10px 0}
+.benefitTitle{color:#a17bb2;font-size:14px;font-weight:600}
+.benefitText{font-size:13px;line-height:1.8;margin-top:5px}
+.special{background:#fff8eb;border-radius:12px;padding:11px;font-size:13px;line-height:1.7;color:#9c7951;margin:10px 0}
+footer{text-align:center;font-size:11px;letter-spacing:2px;color:#b69dc0;padding:20px 0}
+.notice{font-size:12px;line-height:1.7;color:#9a88a4}
+.overlay{position:fixed;inset:0;background:#3d2c4655;z-index:10;overflow:auto;padding:25px 12px}
+.modal{background:#fffafc;border-radius:22px;padding:22px;max-width:430px;margin:25px auto}
+</style>
 </head>
 <body>
-<h1>🌙 STST3</h1>
-<p>Webアプリの準備中です♡</p>
+<main>
+<header>
+<div class="symbol">✧ ☾ ♡ ✧</div>
+<h1>Shining Theater</h1>
+<div class="subtitle">MY THEATER DIARY</div>
+</header>
+
+<section class="card">
+<div class="nav">
+<button onclick="move(-1)">〈</button>
+<strong id="month"></strong>
+<button onclick="move(1)">〉</button>
+</div>
+<div class="pills">
+<button id="all" onclick="setFilter('all')">すべて</button>
+<button id="gold" onclick="setFilter('gold')">✧ Gold</button>
+<button id="silver" onclick="setFilter('silver')">✧ Silver</button>
+</div>
+<div class="week">
+<span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span><span>日</span>
+</div>
+<div class="calendar" id="calendar"></div>
+<p class="small">♡ 観劇予定　● 登録した予定のチーム<br>✧ 公式特典情報あり</p>
+</section>
+
+<section class="card">
+<h2>✧ OFFICIAL BENEFITS</h2>
+<div id="benefits"></div>
+</section>
+
+<section class="card">
+<h2>♡ MY SCHEDULE</h2>
+<div id="dayTitle"></div>
+<div id="entries"></div>
+<div class="actions">
+<button class="primary" onclick="editPlan()">＋ 観劇予定</button>
+</div>
+</section>
+
+<section class="card">
+<h2>♡ SPECIAL GIFTS</h2>
+<div id="gifts"></div>
+</section>
+
+<section class="card">
+<h2>✧ 保存について</h2>
+<p class="notice">観劇予定とSPECIAL GIFTSは、このブラウザに自動保存されます。SafariのWebサイトデータを削除すると消える場合があります。別の端末には自動同期されません。</p>
+<button onclick="exportBackup()">♡ バックアップを書き出す</button>
+<label style="margin-top:14px">バックアップを読み込む
+<input type="file" id="importFile" accept=".json" onchange="importBackup(event)">
+</label>
+</section>
+<footer>A LITTLE MAGIC IN EVERY MOMENT ♡</footer>
+</main>
+
+<script>
+"use strict";
+const STORAGE_KEY="stst-calendar-web-v1";
+
+function loadState(){
+ try{
+  const x=JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}");
+  return {
+   plans:Array.isArray(x.plans)?x.plans:[],
+   gifts:Array.isArray(x.gifts)?x.gifts:[]
+  };
+ }catch(e){return {plans:[],gifts:[]};}
+}
+const state=loadState();
+
+function saveState(){
+ try{
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+ }catch(e){
+  alert("保存できませんでした。Safariの通常タブで開いているか確認してください。");
+ }
+}
+
+const benefitData=[
+ ["2026-11-01","2026-11-08","outer",true],
+ ["2026-11-09","2026-11-22","inner",true],
+ ["2026-11-23","2026-11-30","outer",true],
+ ["2026-12-03","2026-12-06","outer",true],
+ ["2026-12-07","2026-12-20","inner",false],
+ ["2026-12-21","2026-12-30","outer",false]
+];
+
+const specialData={
+ "2026-11-07":["11:30 ローソンチケットスペシャルデー"],
+ "2026-11-17":["14:30・19:30 応援上演"],
+ "2026-11-24":["14:30・19:30 応援上演"],
+ "2026-12-03":["14:30 ファンクラブ会員限定の特別公演"],
+ "2026-12-28":["14:30 キッズ観劇Day"]
+};
+
+const closedDates=[
+ "2026-11-04","2026-11-11",
+ "2026-11-18","2026-11-25",
+ "2026-12-01","2026-12-02"
+];
+
+const officialSchedule={};
+function addShows(dates,team,times){
+ dates.forEach(day=>{
+  officialSchedule["2026-"+day]={team,times};
+ });
+}
+
+addShows(
+ ["11-01","11-09","11-10","11-12","11-13","11-14","11-15","11-16","11-17","11-19","11-20","11-23","11-24","11-26","11-27","11-28","11-29"],
+ "Silver Moon",["14:30","19:30"]
+);
+addShows(
+ ["11-02","11-03","11-05","11-06","11-07","11-08","11-21","11-22","11-30"],
+ "Gold Moon",["14:30","19:30"]
+);
+addShows(
+ ["12-03","12-04","12-14","12-15","12-17","12-18","12-28","12-29"],
+ "Gold Moon",["14:30","19:30"]
+);
+addShows(
+ ["12-05","12-06","12-19","12-20"],
+ "Gold Moon",["11:30","15:30","19:30"]
+);
+addShows(
+ ["12-07","12-08","12-10","12-11","12-21","12-22","12-24","12-25"],
+ "Silver Moon",["14:30","19:30"]
+);
+addShows(
+ ["12-12","12-13","12-26","12-27"],
+ "Silver Moon",["11:30","15:30","19:30"]
+);
+addShows(["12-30"],"Gold Moon",["14:30"]);
+addShows(
+ ["11-07","11-08","11-21","11-22"],
+ "Gold Moon",["11:30","15:30","19:30"]
+);
+addShows(
+ ["11-14","11-15","11-28","11-29"],
+ "Silver Moon",["11:30","15:30","19:30"]
+);
+
+const names=[
+ "セーラームーン","セーラーマーキュリー",
+ "セーラーマーズ","セーラージュピター",
+ "セーラーヴィーナス","タキシード仮面",
+ "セーラーちびムーン","セーラーウラヌス",
+ "セーラーネプチューン","セーラープルート"
+];
+
+const inner="セーラー5戦士・タキシード仮面";
+const outer="スーパーセーラーちびムーン・外部太陽系4戦士";
+const queen="クイーン・ヴァルシア";
+
+const today=new Date();
+let year=today.getFullYear();
+let month=today.getMonth();
+let selected=today.getDate();
+let filter="all";
+
+function pad(n){return String(n).padStart(2,"0");}
+function key(d){return year+"-"+pad(month+1)+"-"+pad(d);}
+
+function matches(p){
+ return filter==="all"||
+  (filter==="gold"&&p.team==="Gold Moon")||
+  (filter==="silver"&&p.team==="Silver Moon");
+}
+
+function safe(s){
+ return String(s==null?"":s).replace(/[&<>"']/g,c=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",
+  '"':"&quot;","'":"&#39;"
+ })[c]);
+}
+
+function move(n){
+ month+=n;
+ if(month<0){month=11;year--;}
+ if(month>11){month=0;year++;}
+ selected=1;
+ render();
+}
+function setFilter(f){filter=f;render();}
+function choose(d){selected=d;render();}
+
+function getBenefit(date){
+ for(const item of benefitData){
+  if(date>=item[0]&&date<=item[1]){
+   const photo=item[2]==="outer"?outer:inner;
+   const sendoff=item[2]==="outer"?inner:outer;
+   return {
+    photo,
+    sendoff:sendoff+"・"+queen+
+     (item[3]?"・ヴァルシア・コード":"")
+   };
+  }
+ }
+ return null;
+}
+
+function render(){
+ document.getElementById("month").textContent=
+  year+"年 "+(month+1)+"月";
+ ["all","gold","silver"].forEach(f=>{
+  document.getElementById(f).className=
+   filter===f?"active":"";
+ });
+
+ const first=(new Date(year,month,1).getDay()+6)%7;
+ const count=new Date(year,month+1,0).getDate();
+ let out="";
+ for(let i=0;i<first;i++)out+="<div></div>";
+
+ for(let d=1;d<=count;d++){
+  const date=key(d);
+  const entries=state.plans.filter(p=>
+   p.date===date&&matches(p)
+  );
+  let dots="";
+  entries.forEach(p=>{
+   dots+='<span class="dot '+
+    (p.team==="Gold Moon"?"gold":"silver")+
+    '"></span>';
+  });
+  const hasInfo=getBenefit(date)||
+   specialData[date]||
+   closedDates.includes(date)||
+   officialSchedule[date];
+
+  out+='<div class="day '+
+   (entries.length?"has ":"")+
+   (selected===d?"selected":"")+
+   '" onclick="choose('+d+')">'+d+
+   (entries.length?'<span class="mark">♡</span>':'')+
+   (hasInfo?'<span class="benefitMark">✧</span>':'')+
+   '<div class="dots">'+dots+'</div></div>';
+ }
+
+ document.getElementById("calendar").innerHTML=out;
+ renderBenefits();
+ renderEntries();
+ renderGifts();
+}
+
+function renderBenefits(){
+ const date=key(selected);
+ const b=getBenefit(date);
+ const show=officialSchedule[date];
+ let out='<p class="small">'+
+  (month+1)+'月'+selected+'日の公式情報</p>';
+
+ if(show){
+  out+='<div class="benefitBox">'+
+   '<div class="benefitTitle">🌙 公式公演スケジュール</div>'+
+   '<div class="benefitText">'+safe(show.team)+'</div>'+
+   '<div class="benefitText">開演：'+
+   safe(show.times.join(" ／ "))+'</div></div>';
+ }
+ if(closedDates.includes(date)){
+  out+='<div class="benefitBox">休演・休館日</div>';
+ }
+ if(b){
+  out+='<div class="benefitBox">'+
+   '<div class="benefitTitle">📷 写真撮影</div>'+
+   '<div class="benefitText">'+safe(b.photo)+'</div>'+
+   '<p class="small">対象：Premium seat / Premium seat（sofa）</p></div>'+
+   '<div class="benefitBox">'+
+   '<div class="benefitTitle">♡ お見送り</div>'+
+   '<div class="benefitText">'+safe(b.sendoff)+'</div></div>';
+ }
+ if(specialData[date]){
+  specialData[date].forEach(note=>{
+   out+='<div class="special">✧ '+safe(note)+'</div>';
+  });
+ }
+ if(!b&&!show&&!specialData[date]&&!closedDates.includes(date)){
+  out+='<p class="small">この日の公式情報は未登録です ♡</p>';
+ }
+ out+='<p class="small">※ 公式情報は手入力した時点の内容です。変更・中止・特別対応は公式サイトをご確認ください。</p>';
+ document.getElementById("benefits").innerHTML=out;
+}
+
+function renderEntries(){
+ const date=key(selected);
+ document.getElementById("dayTitle").textContent=
+  (month+1)+"月"+selected+"日";
+ const entries=state.plans.filter(p=>
+  p.date===date&&matches(p)
+ );
+ let out="";
+ entries.forEach(p=>{
+  const index=state.plans.indexOf(p);
+  out+='<div class="entry"><b>'+safe(p.team)+'</b>'+
+   '<div>開演 '+safe(p.time||"未入力")+'</div>'+
+   '<div>座席 '+safe(p.seat||"未入力")+'</div>'+
+   (p.memo?'<div>'+safe(p.memo)+'</div>':'')+
+   '<button onclick="editPlan('+index+')">編集</button></div>';
+ });
+ if(!entries.length){
+  out='<p class="small">登録した観劇予定はありません ♡</p>';
+ }
+ document.getElementById("entries").innerHTML=out;
+}
+
+function editPlan(index){
+ const existing=index===undefined?null:state.plans[index];
+ const overlay=document.createElement("div");
+ const form=document.createElement("div");
+ overlay.className="overlay";
+ form.className="modal";
+ form.innerHTML=
+  '<h2>♡ 観劇予定</h2>'+
+  '<label>日付<input id="fdate" type="date"></label>'+
+  '<label>チーム<select id="fteam"><option>Gold Moon</option><option>Silver Moon</option></select></label>'+
+  '<label>開演時間<input id="ftime" type="time"></label>'+
+  '<label>座席<input id="fseat" placeholder="例：A列12番"></label>'+
+  '<label>メモ<textarea id="fmemo" rows="3"></textarea></label>'+
+  '<div class="actions"><button class="primary" id="savePlan">保存する ♡</button>'+
+  (existing?'<button class="danger" id="deletePlan">削除</button>':'')+
+  '<button id="cancelPlan">戻る</button></div>';
+
+ overlay.appendChild(form);
+ document.body.appendChild(overlay);
+ const get=id=>form.querySelector("#"+id);
+ get("fdate").value=existing?existing.date:key(selected);
+ get("fteam").value=existing?existing.team:"Gold Moon";
+ get("ftime").value=existing?existing.time||"":"";
+ get("fseat").value=existing?existing.seat||"":"";
+ get("fmemo").value=existing?existing.memo||"":"";
+ get("cancelPlan").onclick=()=>overlay.remove();
+
+ get("savePlan").onclick=()=>{
+  const date=get("fdate").value;
+  if(!date){alert("日付を入力してください");return;}
+  const p={
+   id:existing?existing.id:Date.now(),
+   date,
+   team:get("fteam").value,
+   time:get("ftime").value,
+   seat:get("fseat").value,
+   memo:get("fmemo").value
+  };
+  if(existing)state.plans[index]=p;
+  else state.plans.push(p);
+  const parts=date.split("-").map(Number);
+  year=parts[0];
+  month=parts[1]-1;
+  selected=parts[2];
+  saveState();
+  overlay.remove();
+  render();
+ };
+
+ if(existing){
+  get("deletePlan").onclick=()=>{
+   if(confirm("この予定を削除しますか？")){
+    state.plans.splice(index,1);
+    saveState();
+    overlay.remove();
+    render();
+   }
+  };
+ }
+}
+
+function renderGifts(){
+ let out="";
+ names.forEach((name,i)=>{
+  const checked=state.gifts.includes(i);
+  out+='<div class="gift">'+
+   '<button class="heart" onclick="toggleGift('+i+')">'+
+   (checked?"♥":"♡")+'</button>'+
+   '<span>'+safe(name)+'</span></div>';
+ });
+ document.getElementById("gifts").innerHTML=out;
+}
+
+function toggleGift(i){
+ const pos=state.gifts.indexOf(i);
+ if(pos<0)state.gifts.push(i);
+ else state.gifts.splice(pos,1);
+ saveState();
+ renderGifts();
+}
+
+function exportBackup(){
+ const data=JSON.stringify({
+  version:1,
+  exportedAt:new Date().toISOString(),
+  plans:state.plans,
+  gifts:state.gifts
+ },null,2);
+ const url=URL.createObjectURL(new Blob([data],{
+  type:"application/json"
+ }));
+ const a=document.createElement("a");
+ a.href=url;
+ a.download="stst-backup.json";
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+function importBackup(event){
+ const file=event.target.files[0];
+ if(!file)return;
+ const reader=new FileReader();
+ reader.onload=()=>{
+  try{
+   const data=JSON.parse(reader.result);
+   if(!Array.isArray(data.plans)||!Array.isArray(data.gifts)){
+    throw Error("形式が違います");
+   }
+   if(!confirm("現在の登録内容をバックアップで置き換えますか？"))return;
+   state.plans=data.plans;
+   state.gifts=data.gifts;
+   saveState();
+   render();
+   alert("読み込みました ♡");
+  }catch(e){
+   alert("読み込めませんでした。STSTのバックアップか確認してください。");
+  }finally{
+   event.target.value="";
+  }
+ };
+ reader.readAsText(file);
+}
+
+render();
+</script>
 </body>
 </html>
